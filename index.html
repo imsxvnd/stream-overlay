@@ -8,7 +8,6 @@
     <!-- Correct TMI.js version for browsers -->
     <script src="https://cdn.jsdelivr.net/npm/tmi.js"></script>
 
-
     <style>
         body {
             background: transparent;
@@ -49,43 +48,23 @@
     <div class="chat-container" id="chat-container"></div>
 
     <script>
-        // Ensure TMI.js is loaded
+        // Ensure TMI.js is loaded properly
         if (typeof tmi === "undefined") {
             let script = document.createElement("script");
-            script.src = "https://cdnjs.cloudflare.com/ajax/libs/tmi.js/1.5.0/tmi.min.js";
+            script.src = "https://cdn.jsdelivr.net/npm/tmi.js";
             document.body.appendChild(script);
         }
 
-        // Ensure the chat client is only declared once
+        // Check if Twitch chat client is already running
         if (!window.chatClient) {
+            console.log("Connecting to Twitch chat...");
+
             window.chatClient = new tmi.Client({
                 connection: { reconnect: true },
                 channels: ["sxvnd"] // Replace with your Twitch username
             });
 
-            window.chatClient.connect();
-
-            window.chatClient.on("message", (channel, tags, message, self) => {
-                if (self) return; // Ignore bot's own messages
-
-                displayMessage(tags["display-name"], message);
-            });
-        }
-
-        function displayMessage(username, message) {
-            const chatContainer = document.getElementById("chat-container");
-            const messageElement = document.createElement("div");
-            messageElement.classList.add("chat-message");
-            messageElement.innerHTML = `<strong>${username}:</strong> ${message}`;
-            
-            chatContainer.appendChild(messageElement);
-
-            // Remove message after 8 seconds
-            setTimeout(() => {
-                messageElement.style.opacity = "0";
-                setTimeout(() => chatContainer.removeChild(messageElement), 500);
-            }, 8000);
-        }
-    </script>
-</body>
-</html>
+            window.chatClient.connect().then(() => {
+                console.log("✅ Connected to Twitch chat!");
+            }).catch(err => {
+        
